@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniEvent — GIKI University Events</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #1a237e;
+      --accent:  #e53935;
+    }
+    body { background: #f4f6fb; font-family: 'Segoe UI', sans-serif; }
+
+    /* ── Navbar ── */
+    .navbar { background: var(--primary); box-shadow: 0 2px 12px rgba(0,0,0,.25); }
+    .navbar-brand { font-weight: 700; font-size: 1.4rem; letter-spacing: .5px; }
+    .navbar-brand span { color: #ffcc00; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #283593 60%, #3949ab 100%);
+      color: #fff; padding: 70px 0 50px;
+    }
+    .hero h1 { font-size: 2.8rem; font-weight: 800; }
+    .hero p  { font-size: 1.15rem; opacity: .85; }
+    .badge-live { background: var(--accent); font-size: .75rem; vertical-align: middle; }
+
+    /* ── Filter bar ── */
+    .filter-bar { background: #fff; border-radius: 12px; padding: 18px 24px;
+                  box-shadow: 0 2px 12px rgba(0,0,0,.07); margin-bottom: 30px; }
+
+    /* ── Event card ── */
+    .event-card {
+      border: none; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 3px 14px rgba(0,0,0,.08);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .event-card:hover { transform: translateY(-5px); box-shadow: 0 8px 28px rgba(0,0,0,.14); }
+    .event-card img { height: 200px; object-fit: cover; width: 100%; }
+    .event-card .card-body { padding: 20px; }
+    .genre-badge { font-size: .7rem; padding: 4px 10px; border-radius: 20px;
+                   background: #e8eaf6; color: var(--primary); font-weight: 600; }
+    .event-title { font-size: 1.05rem; font-weight: 700; color: #1a237e; margin: 8px 0 6px; }
+    .event-meta  { font-size: .82rem; color: #666; }
+    .event-meta i { width: 16px; color: var(--primary); }
+    .btn-register { background: var(--primary); color: #fff; border: none;
+                    border-radius: 8px; font-size: .85rem; padding: 7px 18px; }
+    .btn-register:hover { background: #283593; color: #fff; }
+
+    /* ── Upload section ── */
+    .upload-section { background: #fff; border-radius: 14px; padding: 30px;
+                      box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+    #uploadStatus { font-size: .9rem; margin-top: 10px; }
+
+    /* ── Stats bar ── */
+    .stat-card { background: #fff; border-radius: 12px; padding: 20px 24px;
+                 box-shadow: 0 2px 10px rgba(0,0,0,.06); text-align: center; }
+    .stat-card .number { font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .stat-card .label  { font-size: .8rem; color: #888; text-transform: uppercase; }
+
+    footer { background: var(--primary); color: rgba(255,255,255,.7);
+             padding: 24px 0; font-size: .85rem; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#">Uni<span>Event</span></a>
+    <span class="badge badge-live rounded-pill ms-2">LIVE</span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center gap-2">
+        <li class="nav-item"><a class="nav-link active" href="#">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="#upload">Upload Poster</a></li>
+        <li class="nav-item">
+          <button class="btn btn-outline-light btn-sm" onclick="refreshEvents()">
+            <i class="fas fa-sync-alt me-1"></i>Refresh
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="container">
+    <h1><i class="fas fa-calendar-star me-2"></i>University Events</h1>
+    <p>Discover, register, and never miss a campus event — powered by AWS cloud infrastructure.</p>
+    <div class="row g-3 mt-3">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="number" id="totalCount">{{ events|length }}</div>
+          <div class="label">Total Events</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="number">AWS</div>
+          <div class="label">Cloud Hosted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="container my-5">
+
+  <!-- Filter bar -->
+  <div class="filter-bar d-flex flex-wrap gap-3 align-items-center">
+    <input id="searchInput" class="form-control w-auto flex-grow-1"
+           placeholder="🔍  Search events..." oninput="filterEvents()" />
+    <select id="genreFilter" class="form-select w-auto" onchange="filterEvents()">
+      <option value="">All Genres</option>
+    </select>
+    <span class="text-muted small" id="resultCount"></span>
+  </div>
+
+  <!-- Event grid -->
+  <div class="row g-4" id="eventsGrid">
+    {% for event in events %}
+    <div class="col-md-6 col-lg-4 event-item"
+         data-title="{{ event.title|lower }}"
+         data-genre="{{ event.genre }}">
+      <div class="card event-card h-100">
+        {% if event.image_url %}
+          <img src="{{ event.image_url }}" alt="{{ event.title }}"
+               onerror="this.src='https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600'" />
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600" alt="Event" />
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+          <span class="genre-badge">{{ event.genre }}</span>
+          <div class="event-title">{{ event.title }}</div>
+          <div class="event-meta mb-2">
+            <div><i class="fas fa-calendar-alt"></i> {{ event.date }}
+              {% if event.time %} &nbsp;·&nbsp; {{ event.time[:5] }}{% endif %}
+            </div>
+            {% if event.venue %}
+            <div><i class="fas fa-map-marker-alt"></i>
+              {{ event.venue.name }}{% if event.venue.city %}, {{ event.venue.city }}{% endif %}
+            </div>
+            {% endif %}
+          </div>
+          <p class="text-muted small flex-grow-1">
+            {{ event.description[:120] }}{% if event.description|length > 120 %}…{% endif %}
+          </p>
+          <a href="{{ event.url }}" target="_blank" class="btn btn-register mt-2 align-self-start">
+            <i class="fas fa-ticket-alt me-1"></i>Register
+          </a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted py-5">
+      <i class="fas fa-calendar-times fa-3x mb-3 opacity-25"></i>
+      <p>No events found. Click <strong>Refresh</strong> to fetch the latest events.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Upload poster -->
+  <div id="upload" class="upload-section mt-5">
+    <h4 class="mb-3"><i class="fas fa-cloud-upload-alt me-2 text-primary"></i>Upload Event Poster to S3</h4>
+    <p class="text-muted small">Upload a poster image and it will be stored securely in Amazon S3.</p>
+    <div class="row g-3 align-items-end">
+      <div class="col-md-6">
+        <input type="file" id="posterFile" class="form-control" accept="image/*" />
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-register w-100" onclick="uploadPoster()">
+          <i class="fas fa-upload me-1"></i>Upload
+        </button>
+      </div>
+    </div>
+    <div id="uploadStatus"></div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="text-center">
+  <div class="container">
+    <p class="mb-1">UniEvent &mdash; Ghulam Ishaq Khan Institute &nbsp;|&nbsp; CE 308/408 Cloud Computing Assignment</p>
+    <p class="mb-0 opacity-50">Deployed on AWS · EC2 · S3 · ELB · VPC · IAM</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ── Populate genre filter ──────────────────────────────────────────────────
+  const items = document.querySelectorAll('.event-item');
+  const genres = [...new Set([...items].map(el => el.dataset.genre).filter(Boolean))];
+  const sel = document.getElementById('genreFilter');
+  genres.forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+  updateCount();
+
+  function filterEvents() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const g = sel.value;
+    items.forEach(el => {
+      const match = (!q || el.dataset.title.includes(q)) && (!g || el.dataset.genre === g);
+      el.style.display = match ? '' : 'none';
+    });
+    updateCount();
+  }
+
+  function updateCount() {
+    const visible = [...items].filter(el => el.style.display !== 'none').length;
+    document.getElementById('resultCount').textContent = `Showing ${visible} event${visible !== 1 ? 's' : ''}`;
+  }
+
+  // ── Refresh events ─────────────────────────────────────────────────────────
+  async function refreshEvents() {
+    const btn = event.target.closest('button');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing…';
+    try {
+      const r = await fetch('/api/events/refresh', { method: 'POST' });
+      const d = await r.json();
+      alert(`✅ ${d.message} (${d.count} events loaded)`);
+      location.reload();
+    } catch(e) {
+      alert('❌ Refresh failed. Check server logs.');
+    } finally {
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Refresh';
+    }
+  }
+
+  // ── Upload poster ──────────────────────────────────────────────────────────
+  async function uploadPoster() {
+    const file = document.getElementById('posterFile').files[0];
+    const status = document.getElementById('uploadStatus');
+    if (!file) { status.innerHTML = '<span class="text-danger">Please select a file first.</span>'; return; }
+    const fd = new FormData(); fd.append('poster', file);
+    status.innerHTML = '<span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i>Uploading to S3…</span>';
+    try {
+      const r = await fetch('/api/upload-poster', { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.url) {
+        status.innerHTML = `<span class="text-success"><i class="fas fa-check me-1"></i>Uploaded! 
+          <a href="${d.url}" target="_blank">View poster (expires in 1h)</a></span>`;
+      } else {
+        status.innerHTML = `<span class="text-danger">${d.error}</span>`;
+      }
+    } catch(e) {
+      status.innerHTML = '<span class="text-danger">Upload failed.</span>';
+    }
+  }
+</script>
+</body>
+</html>
