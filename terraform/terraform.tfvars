@@ -3,8 +3,8 @@
 
 aws_region           = "us-east-1"
 project_name         = "unievent"
-s3_bucket_name       = "unievent-media-bucket-giki-2025"   # must be globally unique
+s3_bucket_name       = "unievent-media-bucket-zain-2026"
 instance_type        = "t3.micro"
 key_pair_name        = "unievent-key"
-ssh_allowed_cidr     = "YOUR_IP/32"
-ticketmaster_api_key = "YOUR_TICKETMASTER_API_KEY"
+ssh_allowed_cidr     = "0.0.0.0/0"
+ticketmaster_api_key = "pJlcWAspNKEKLfsvQ2AVHxRqUoPpeAGE"
