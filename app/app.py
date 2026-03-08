@@ -103,7 +103,7 @@ def _mock_events():
             "venue": {"name": "Main Auditorium", "city": "Topi", "country": "Pakistan"},
             "description": "Showcase your projects and innovations at GIKI's biggest tech festival.",
             "image_url": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600",
-            "url": "https://forms.gle/example-tech-fest",
+            "url": "https://www.giki.edu.pk/events",
             "genre": "Technology",
         },
         {
@@ -114,7 +114,7 @@ def _mock_events():
             "venue": {"name": "Sports Complex", "city": "Topi", "country": "Pakistan"},
             "description": "Compete in cricket, football, basketball and more against top universities.",
             "image_url": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600",
-            "url": "https://forms.gle/example-sports-gala",
+            "url": "https://www.giki.edu.pk/events",
             "genre": "Sports",
         },
         {
@@ -125,7 +125,7 @@ def _mock_events():
             "venue": {"name": "Open Amphitheatre", "city": "Topi", "country": "Pakistan"},
             "description": "A night of music, dance, and cultural performances by GIKI students.",
             "image_url": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600",
-            "url": "https://forms.gle/example-cultural-night",
+            "url": "https://www.giki.edu.pk/events",
             "genre": "Arts",
         },
     ]
