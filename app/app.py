@@ -23,29 +23,36 @@ s3 = boto3.client("s3", region_name=AWS_REGION)
 # ─── Fetch events from Ticketmaster API ───────────────────────────────────────
 def fetch_events_from_api():
     """Fetch events from Ticketmaster Discovery API and store in S3."""
-    if not TICKETMASTER_KEY:
-        logger.warning("No Ticketmaster API key set — using mock data.")
-        return _mock_events()
+    # For submission: Use mock university events only
+    logger.info("Using mock university events for demonstration.")
+    events = _mock_events()
+    _save_events_to_s3(events)
+    return events
+    
+    # Ticketmaster API integration (disabled for submission)
+    # if not TICKETMASTER_KEY:
+    #     logger.warning("No Ticketmaster API key set — using mock data.")
+    #     return _mock_events()
 
-    url = "https://app.ticketmaster.com/discovery/v2/events.json"
-    params = {
-        "apikey":        TICKETMASTER_KEY,
-        "classificationName": "music,sports,arts",
-        "size":          20,
-        "sort":          "date,asc",
-        "countryCode":   "US",
-    }
-    try:
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        raw = resp.json()
-        events = _parse_ticketmaster(raw)
-        _save_events_to_s3(events)
-        logger.info(f"Fetched & stored {len(events)} events from Ticketmaster.")
-        return events
-    except Exception as e:
-        logger.error(f"Error fetching events: {e}")
-        return _load_events_from_s3()
+    # url = "https://app.ticketmaster.com/discovery/v2/events.json"
+    # params = {
+    #     "apikey":        TICKETMASTER_KEY,
+    #     "classificationName": "music,sports,arts",
+    #     "size":          20,
+    #     "sort":          "date,asc",
+    #     "countryCode":   "US",
+    # }
+    # try:
+    #     resp = requests.get(url, params=params, timeout=10)
+    #     resp.raise_for_status()
+    #     raw = resp.json()
+    #     events = _parse_ticketmaster(raw)
+    #     _save_events_to_s3(events)
+    #     logger.info(f"Fetched & stored {len(events)} events from Ticketmaster.")
+    #     return events
+    # except Exception as e:
+    #     logger.error(f"Error fetching events: {e}")
+    #     return _load_events_from_s3()
 
 def _parse_ticketmaster(raw):
     items = raw.get("_embedded", {}).get("events", [])
