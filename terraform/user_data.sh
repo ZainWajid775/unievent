@@ -13,7 +13,7 @@ fi
 cd unievent/app
 
 # ── Install Python dependencies ────────────────────────────────────────────────
-pip3 install -r requirements.txt
+pip3 install --ignore-installed -r  requirements.txt
 
 # ── Set environment variables ──────────────────────────────────────────────────
 cat > /etc/unievent.env <<EOF
