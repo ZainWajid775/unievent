@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # ── System updates ─────────────────────────────────────────────────────────────
 yum update -y
@@ -7,7 +7,9 @@ yum install -y python3 python3-pip git
 
 # ── Clone application from GitHub ─────────────────────────────────────────────
 cd /home/ec2-user
-git clone https://github.com/ZainWajid775/unievent.git || true
+if [ ! -d "unievent" ]; then
+    git clone https://github.com/ZainWajid775/unievent.git
+fi
 cd unievent/app
 
 # ── Install Python dependencies ────────────────────────────────────────────────
@@ -40,4 +42,5 @@ SERVICE
 
 systemctl daemon-reload
 systemctl enable unievent
+systemctl start unievent
 systemctl start unievent
