@@ -6,9 +6,8 @@ yum update -y
 yum install -y python3 python3-pip git
 
 # ── Clone application from GitHub ─────────────────────────────────────────────
-# Replace with your actual GitHub repo URL after pushing
 cd /home/ec2-user
-git clone https://github.com/YOUR_USERNAME/unievent.git || true
+git clone https://github.com/ZainWajid775/unievent.git || true
 cd unievent/app
 
 # ── Install Python dependencies ────────────────────────────────────────────────
