@@ -13,7 +13,9 @@ fi
 cd unievent/app
 
 # ── Install Python dependencies ────────────────────────────────────────────────
-pip3 install --ignore-installed -r  requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
 # ── Set environment variables ──────────────────────────────────────────────────
 cat > /etc/unievent.env <<EOF
@@ -32,7 +34,7 @@ After=network.target
 User=ec2-user
 WorkingDirectory=/home/ec2-user/unievent/app
 EnvironmentFile=/etc/unievent.env
-ExecStart=/usr/local/bin/gunicorn --bind 0.0.0.0:5000 --workers 3 --timeout 120 app:app
+ExecStart=/home/ec2-user/unievent/app/venv/bin/gunicorn --bind 0.0.0.0:5000 --workers 3 --timeout 120 app:app
 Restart=always
 RestartSec=5
 
